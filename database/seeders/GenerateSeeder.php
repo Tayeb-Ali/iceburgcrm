@@ -27,13 +27,13 @@ class GenerateSeeder extends Seeder
      */
     public function run()
     {
-        $seedAmount=50;
+        $seedAmount = 50;
         Log::info("Generating users");
         $this->AddUsers();
         $this->AddSettings();
 
         Log::info("Add Workflow Actions");
-       // $this->addWorkflowActions();
+        // $this->addWorkflowActions();
 
         Log::info("Add Datalet Types");
         $this->addDataletTypes();
@@ -46,20 +46,20 @@ class GenerateSeeder extends Seeder
 
         Log::info("Generating static lists");
 
-         $faker = Factory::create();
-        $current=$this;
+        $faker = Factory::create();
+        $current = $this;
         Module::where('status', 1)
             ->where('create_table', 1)
             ->where('faker_seed', 0)
             ->get()
             ->each(function ($module) use ($current, $faker) {
-                if(method_exists($current, $module->name)) {
+                if (method_exists($current, $module->name)) {
                     Log::info("Generating module: " . $module->name);
-                    $table=strtolower($module->name);
+                    $table = strtolower($module->name);
                     DB::table($table)->truncate();
-                    $data=$current->{$module->name}();
-                    foreach($data as $row) {
-                        $row['slug']=bin2hex(random_bytes(16));
+                    $data = $current->{$module->name}();
+                    foreach ($data as $row) {
+                        $row['slug'] = bin2hex(random_bytes(16));
                         DB::table($table)->insert($row);
                     }
                 }
@@ -70,11 +70,10 @@ class GenerateSeeder extends Seeder
     }
 
 
-
     private function sampleMedia()
     {
-        $file=file_get_contents('http://demo.iceburg.ca/seed/video/christmasornaments.mp4');
-        if($file){
+        $file = file_get_contents('http://demo.iceburg.ca/seed/video/christmasornaments.mp4');
+        if ($file) {
             //  'creative' => 'data:video/mp4;base64,'.base64_encode($file),
             DB::table('campaigns')->insert(
                 ['name' => 'Christmas Ad Campaign',
@@ -83,7 +82,7 @@ class GenerateSeeder extends Seeder
                     'forecast' => '8000',
                     'impressions' => 15346,
                     'currency' => 1,
-                    'creative' => 'data:video/mp4;base64,'.base64_encode($file),
+                    'creative' => 'data:video/mp4;base64,' . base64_encode($file),
                     'campaign_type' => 1,
                     'assigned_to' => 1,
                     'slug' => 'dsfsdfsdfs',
@@ -95,20 +94,20 @@ class GenerateSeeder extends Seeder
             );
         }
 
-        $data['created_at']=date('Y-m-d H:i:s', strtotime("-" . rand(1, 31) . " DAY"));
-        $data['updated_at']=$data['created_at'];
+        $data['created_at'] = date('Y-m-d H:i:s', strtotime("-" . rand(1, 31) . " DAY"));
+        $data['updated_at'] = $data['created_at'];
 
 
-        $file=file_get_contents('http://demo.iceburg.ca/seed/recording/sample.ogg');
+        $file = file_get_contents('http://demo.iceburg.ca/seed/recording/sample.ogg');
         //           'audio_recording' => 'data:audio/ogg;base64,'.base64_encode($file),
-        if($file){
+        if ($file) {
             DB::table('meetings')->insert(
                 ['name' => 'Client Meeting',
                     'description' => 'This is a typical service call',
                     'start_date' => strtotime('NOW'),
                     'end_date' => strtotime('NOW'),
                     'location' => 'Office',
-                    'audio_recording' => 'data:audio/ogg;base64,'.base64_encode($file),
+                    'audio_recording' => 'data:audio/ogg;base64,' . base64_encode($file),
                     'types' => 1,
                     'assigned_to' => 1,
                     'slug' => 'dsfsdfsdfss',
@@ -125,14 +124,13 @@ class GenerateSeeder extends Seeder
     private function addModulesAndRoles()
     {
         $module = Module::where('name', 'ice_roles')->first();
-        $records=DB::table($module->name)->get();
+        $records = DB::table($module->name)->get();
         Permission::truncate();
-        foreach($records as $record)
-        {
+        foreach ($records as $record) {
             Module::all()->each(function ($module) use ($record) {
                 Permission::insert([
-                   'role_id' => $record->id,
-                   'module_id' => $module->id
+                    'role_id' => $record->id,
+                    'module_id' => $module->id
                 ]);
             });
         }
@@ -158,38 +156,38 @@ class GenerateSeeder extends Seeder
         Datalet::truncate();
         Datalet::insert([
 
-            ['type'=>1,
-                'module_id'=>0,
+            ['type' => 1,
+                'module_id' => 0,
                 'label' => 'Total Sales',
                 'size' => 12,
                 'display_order' => 1],
-            ['type'=>2,
-                'module_id'=>0,
+            ['type' => 2,
+                'module_id' => 0,
                 'label' => 'Number of new Leads / Contacts / Accounts over the last 7 Days',
                 'size' => 12,
                 'display_order' => 2],
-            ['type'=>3,
-                'module_id'=>0,
+            ['type' => 3,
+                'module_id' => 0,
                 'label' => 'Meetings',
                 'size' => 12,
                 'display_order' => 4],
-            ['type'=>4,
-                'module_id'=>0,
+            ['type' => 4,
+                'module_id' => 0,
                 'label' => 'Number of new Opportunities / Quotes / Contracts over the last 7 Days',
                 'size' => 12,
                 'display_order' => 5],
-            ['type'=>1,
-                'module_id'=>0,
+            ['type' => 1,
+                'module_id' => 0,
                 'label' => 'Orders This Month',
                 'size' => 12,
                 'display_order' => 7],
-            ['type'=>7,
-                'module_id'=>2,
+            ['type' => 7,
+                'module_id' => 2,
                 'label' => 'CRM Stats',
                 'size' => 12,
                 'display_order' => 12],
-            ['type'=>8,
-                'module_id'=>1,
+            ['type' => 8,
+                'module_id' => 1,
                 'label' => 'Totals Report',
                 'size' => 12,
                 'display_order' => 6],
@@ -199,7 +197,7 @@ class GenerateSeeder extends Seeder
 
     private function addWorkflowActions()
     {
-        WorkflowAction::insert (
+        WorkflowAction::insert(
             [
                 ['name' => 'Insert new Module Record'],
                 ['name' => 'Insert new Relationship Record'],
@@ -214,9 +212,17 @@ class GenerateSeeder extends Seeder
 
     private function AddUsers()
     {
+        $context = stream_context_create(
+            array(
+                "http" => array(
+                    "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+                )
+            )
+        );
+
         User::truncate();
-        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10,99) . '.jpg');
-        $userId=DB::table('ice_users')->insertGetId([
+        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10, 99) . '.jpg', false, $context);
+        DB::table('ice_users')->insertGetId([
             'name' => 'Admin',
             'email' => 'admin@iceburg.ca',
             'profile_pic' => 'data:image/jpg;base64,' . base64_encode($image),
@@ -224,8 +230,8 @@ class GenerateSeeder extends Seeder
             'role_id' => 1
         ]);
 
-        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10,99) . '.jpg');
-        $userId=DB::table('ice_users')->insertGetId([
+        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10, 99) . '.jpg', false, $context);
+        DB::table('ice_users')->insertGetId([
             'name' => 'User',
             'email' => 'user@iceburg.ca',
             'profile_pic' => 'data:image/jpg;base64,' . base64_encode($image),
@@ -233,8 +239,8 @@ class GenerateSeeder extends Seeder
             'role_id' => 2
         ]);
 
-        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10,99) . '.jpg');
-        $userId=DB::table('ice_users')->insertGetId([
+        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10, 99) . '.jpg', false, $context);
+        DB::table('ice_users')->insertGetId([
             'name' => 'Sales',
             'email' => 'sales@iceburg.ca',
             'profile_pic' => 'data:image/jpg;base64,' . base64_encode($image),
@@ -242,8 +248,8 @@ class GenerateSeeder extends Seeder
             'role_id' => 3
         ]);
 
-        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10,99) . '.jpg');
-        $userId=DB::table('ice_users')->insertGetId([
+        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10, 99) . '.jpg', false, $context);
+        DB::table('ice_users')->insertGetId([
             'name' => 'Accounting',
             'email' => 'accounting@iceburg.ca',
             'profile_pic' => 'data:image/jpg;base64,' . base64_encode($image),
@@ -251,8 +257,8 @@ class GenerateSeeder extends Seeder
             'role_id' => 4
         ]);
 
-        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10,99) . '.jpg');
-        $userId=DB::table('ice_users')->insertGetId([
+        $image = file_get_contents('http://demo.iceburg.ca/seed/people/0000' . rand(10, 99) . '.jpg', false, $context);
+        DB::table('ice_users')->insertGetId([
             'name' => 'Marketing',
             'email' => 'marketing@iceburg.ca',
             'profile_pic' => 'data:image/jpg;base64,' . base64_encode($image),
@@ -293,7 +299,6 @@ class GenerateSeeder extends Seeder
             'name' => 'max_export_records',
             'value' => 10000
         ]);
-
 
 
     }
@@ -352,110 +357,110 @@ class GenerateSeeder extends Seeder
     private function Currency()
     {
         return [
-            ['code' =>'AFN' , 'name' => 'Afghani', 'symbol' => '؋' ],
-            ['code' =>'ALL' , 'name' => 'Lek', 'symbol' => 'Lek' ],
-            ['code' =>'ANG' , 'name' => 'Netherlands Antillian Guilder', 'symbol' => 'ƒ' ],
-            ['code' =>'ARS' , 'name' => 'Argentine Peso', 'symbol' => '$' ],
-            ['code' =>'AUD' , 'name' => 'Australian Dollar', 'symbol' => '$' ],
-            ['code' =>'AWG' , 'name' => 'Aruban Guilder', 'symbol' => 'ƒ' ],
-            ['code' =>'AZN' , 'name' => 'Azerbaijanian Manat', 'symbol' => 'ман' ],
-            ['code' =>'BAM' , 'name' => 'Convertible Marks', 'symbol' => 'KM' ],
+            ['code' => 'AFN', 'name' => 'Afghani', 'symbol' => '؋'],
+            ['code' => 'ALL', 'name' => 'Lek', 'symbol' => 'Lek'],
+            ['code' => 'ANG', 'name' => 'Netherlands Antillian Guilder', 'symbol' => 'ƒ'],
+            ['code' => 'ARS', 'name' => 'Argentine Peso', 'symbol' => '$'],
+            ['code' => 'AUD', 'name' => 'Australian Dollar', 'symbol' => '$'],
+            ['code' => 'AWG', 'name' => 'Aruban Guilder', 'symbol' => 'ƒ'],
+            ['code' => 'AZN', 'name' => 'Azerbaijanian Manat', 'symbol' => 'ман'],
+            ['code' => 'BAM', 'name' => 'Convertible Marks', 'symbol' => 'KM'],
             ['code' => 'BDT', 'name' => 'Bangladeshi Taka', 'symbol' => '৳'],
-            ['code' =>'BBD' , 'name' => 'Barbados Dollar', 'symbol' => '$' ],
-            ['code' =>'BGN' , 'name' => 'Bulgarian Lev', 'symbol' => 'лв' ],
-            ['code' =>'BMD' , 'name' => 'Bermudian Dollar', 'symbol' => '$' ],
-            ['code' =>'BND' , 'name' => 'Brunei Dollar', 'symbol' => '$' ],
-            ['code' =>'BOB' , 'name' => 'BOV Boliviano Mvdol', 'symbol' => '$b' ],
-            ['code' =>'BRL' , 'name' => 'Brazilian Real', 'symbol' => 'R$' ],
-            ['code' =>'BSD' , 'name' => 'Bahamian Dollar', 'symbol' => '$' ],
-            ['code' =>'BWP' , 'name' => 'Pula', 'symbol' => 'P' ],
-            ['code' =>'BYR' , 'name' => 'Belarussian Ruble', 'symbol' => '₽' ],
-            ['code' =>'BZD' , 'name' => 'Belize Dollar', 'symbol' => 'BZ$' ],
-            ['code' =>'CAD' , 'name' => 'Canadian Dollar', 'symbol' => '$' ],
-            ['code' =>'CHF' , 'name' => 'Swiss Franc', 'symbol' => 'CHF' ],
-            ['code' =>'CLP' , 'name' => 'CLF Chilean Peso Unidades de fomento', 'symbol' => '$' ],
-            ['code' =>'CNY' , 'name' => 'Yuan Renminbi', 'symbol' => '¥' ],
-            ['code' =>'COP' , 'name' => 'COU Colombian Peso Unidad de Valor Real', 'symbol' => '$' ],
-            ['code' =>'CRC' , 'name' => 'Costa Rican Colon', 'symbol' => '₡' ],
-            ['code' =>'CUP' , 'name' => 'CUC Cuban Peso Peso Convertible', 'symbol' => '₱' ],
-            ['code' =>'CZK' , 'name' => 'Czech Koruna', 'symbol' => 'Kč' ],
-            ['code' =>'DKK' , 'name' => 'Danish Krone', 'symbol' => 'kr' ],
-            ['code' =>'DOP' , 'name' => 'Dominican Peso', 'symbol' => 'RD$' ],
-            ['code' =>'EGP' , 'name' => 'Egyptian Pound', 'symbol' => '£' ],
-            ['code' =>'EUR' , 'name' => 'Euro', 'symbol' => '€' ],
-            ['code' =>'FJD' , 'name' => 'Fiji Dollar', 'symbol' => '$' ],
-            ['code' =>'FKP' , 'name' => 'Falkland Islands Pound', 'symbol' => '£' ],
-            ['code' =>'GBP' , 'name' => 'Pound Sterling', 'symbol' => '£' ],
-            ['code' =>'GIP' , 'name' => 'Gibraltar Pound', 'symbol' => '£' ],
-            ['code' =>'GTQ' , 'name' => 'Quetzal', 'symbol' => 'Q' ],
-            ['code' =>'GYD' , 'name' => 'Guyana Dollar', 'symbol' => '$' ],
-            ['code' =>'HKD' , 'name' => 'Hong Kong Dollar', 'symbol' => '$' ],
-            ['code' =>'HNL' , 'name' => 'Lempira', 'symbol' => 'L' ],
-            ['code' =>'HRK' , 'name' => 'Croatian Kuna', 'symbol' => 'kn' ],
-            ['code' =>'HUF' , 'name' => 'Forint', 'symbol' => 'Ft' ],
-            ['code' =>'IDR' , 'name' => 'Rupiah', 'symbol' => 'Rp' ],
-            ['code' =>'ILS' , 'name' => 'New Israeli Sheqel', 'symbol' => '₪' ],
-            ['code' =>'IRR' , 'name' => 'Iranian Rial', 'symbol' => '﷼' ],
-            ['code' =>'ISK' , 'name' => 'Iceland Krona', 'symbol' => 'kr' ],
-            ['code' =>'JMD' , 'name' => 'Jamaican Dollar', 'symbol' => 'J$' ],
-            ['code' =>'JPY' , 'name' => 'Yen', 'symbol' => '¥' ],
-            ['code' =>'KGS' , 'name' => 'Som', 'symbol' => 'лв' ],
-            ['code' =>'KHR' , 'name' => 'Riel', 'symbol' => '៛' ],
-            ['code' =>'KPW' , 'name' => 'North Korean Won', 'symbol' => '₩' ],
-            ['code' =>'KRW' , 'name' => 'Won', 'symbol' => '₩' ],
-            ['code' =>'KYD' , 'name' => 'Cayman Islands Dollar', 'symbol' => '$' ],
-            ['code' =>'KZT' , 'name' => 'Tenge', 'symbol' => 'лв' ],
-            ['code' =>'LAK' , 'name' => 'Kip', 'symbol' => '₭' ],
-            ['code' =>'LBP' , 'name' => 'Lebanese Pound', 'symbol' => '£' ],
-            ['code' =>'LKR' , 'name' => 'Sri Lanka Rupee', 'symbol' => '₨' ],
-            ['code' =>'LRD' , 'name' => 'Liberian Dollar', 'symbol' => '$' ],
-            ['code' =>'LTL' , 'name' => 'Lithuanian Litas', 'symbol' => 'Lt' ],
-            ['code' =>'LVL' , 'name' => 'Latvian Lats', 'symbol' => 'Ls' ],
-            ['code' =>'MKD' , 'name' => 'Denar', 'symbol' => 'ден' ],
-            ['code' =>'MNT' , 'name' => 'Tugrik', 'symbol' => '₮' ],
-            ['code' =>'MUR' , 'name' => 'Mauritius Rupee', 'symbol' => '₨' ],
-            ['code' =>'MXN' , 'name' => 'MXV Mexican Peso Mexican Unidad de Inversion (UDI]', 'symbol' => '$' ],
-            ['code' =>'MYR' , 'name' => 'Malaysian Ringgit', 'symbol' => 'RM' ],
-            ['code' =>'MZN' , 'name' => 'Metical', 'symbol' => 'MT' ],
-            ['code' =>'NGN' , 'name' => 'Naira', 'symbol' => '₦' ],
-            ['code' =>'NIO' , 'name' => 'Cordoba Oro', 'symbol' => 'C$' ],
-            ['code' =>'NOK' , 'name' => 'Norwegian Krone', 'symbol' => 'kr' ],
-            ['code' =>'NPR' , 'name' => 'Nepalese Rupee', 'symbol' => '₨' ],
-            ['code' =>'NZD' , 'name' => 'New Zealand Dollar', 'symbol' => '$' ],
-            ['code' =>'OMR' , 'name' => 'Rial Omani', 'symbol' => '﷼' ],
-            ['code' =>'PAB' , 'name' => 'USD Balboa US Dollar', 'symbol' => 'B/.' ],
-            ['code' =>'PEN' , 'name' => 'Nuevo Sol', 'symbol' => 'S/.' ],
-            ['code' =>'PHP' , 'name' => 'Philippine Peso', 'symbol' => 'Php' ],
-            ['code' =>'PKR' , 'name' => 'Pakistan Rupee', 'symbol' => '₨' ],
-            ['code' =>'PLN' , 'name' => 'Zloty', 'symbol' => 'zł' ],
-            ['code' =>'PYG' , 'name' => 'Guarani', 'symbol' => 'Gs' ],
-            ['code' =>'QAR' , 'name' => 'Qatari Rial', 'symbol' => '﷼' ],
-            ['code' =>'RON' , 'name' => 'New Leu', 'symbol' => 'lei' ],
-            ['code' =>'RSD' , 'name' => 'Serbian Dinar', 'symbol' => 'Дин.' ],
-            ['code' =>'RUB' , 'name' => 'Russian Ruble', 'symbol' => 'руб' ],
-            ['code' =>'SAR' , 'name' => 'Saudi Riyal', 'symbol' => '﷼' ],
-            ['code' =>'SBD' , 'name' => 'Solomon Islands Dollar', 'symbol' => '$' ],
-            ['code' =>'SCR' , 'name' => 'Seychelles Rupee', 'symbol' => '₨' ],
-            ['code' =>'SEK' , 'name' => 'Swedish Krona', 'symbol' => 'kr' ],
-            ['code' =>'SGD' , 'name' => 'Singapore Dollar', 'symbol' => '$' ],
-            ['code' =>'SHP' , 'name' => 'Saint Helena Pound', 'symbol' => '£' ],
-            ['code' =>'SOS' , 'name' => 'Somali Shilling', 'symbol' => 'S' ],
-            ['code' =>'SRD' , 'name' => 'Surinam Dollar', 'symbol' => '$' ],
-            ['code' =>'SVC' , 'name' => 'USD El Salvador Colon US Dollar', 'symbol' => '$' ],
-            ['code' =>'SYP' , 'name' => 'Syrian Pound', 'symbol' => '£' ],
-            ['code' =>'THB' , 'name' => 'Baht', 'symbol' => '฿' ],
-            ['code' =>'TRY' , 'name' => 'Turkish Lira', 'symbol' => 'TL' ],
-            ['code' =>'TTD' , 'name' => 'Trinidad and Tobago Dollar', 'symbol' => 'TT$' ],
-            ['code' =>'TWD' , 'name' => 'New Taiwan Dollar', 'symbol' => 'NT$' ],
-            ['code' =>'UAH' , 'name' => 'Hryvnia', 'symbol' => '₴' ],
-            ['code' =>'USD' , 'name' => 'US Dollar', 'symbol' => '$' ],
-            ['code' =>'UYU' , 'name' => 'UYI Uruguay Peso en Unidades Indexadas', 'symbol' => '$U' ],
-            ['code' =>'UZS' , 'name' => 'Uzbekistan Sum', 'symbol' => 'лв' ],
-            ['code' =>'VEF' , 'name' => 'Bolivar Fuerte', 'symbol' => 'Bs' ],
-            ['code' =>'VND' , 'name' => 'Dong', 'symbol' => '₫' ],
-            ['code' =>'XCD' , 'name' => 'East Caribbean Dollar', 'symbol' => '$' ],
-            ['code' =>'YER' , 'name' => 'Yemeni Rial', 'symbol' => '﷼' ],
-            ['code' =>'ZAR' , 'name' => 'Rand', 'symbol' => 'R' ],
+            ['code' => 'BBD', 'name' => 'Barbados Dollar', 'symbol' => '$'],
+            ['code' => 'BGN', 'name' => 'Bulgarian Lev', 'symbol' => 'лв'],
+            ['code' => 'BMD', 'name' => 'Bermudian Dollar', 'symbol' => '$'],
+            ['code' => 'BND', 'name' => 'Brunei Dollar', 'symbol' => '$'],
+            ['code' => 'BOB', 'name' => 'BOV Boliviano Mvdol', 'symbol' => '$b'],
+            ['code' => 'BRL', 'name' => 'Brazilian Real', 'symbol' => 'R$'],
+            ['code' => 'BSD', 'name' => 'Bahamian Dollar', 'symbol' => '$'],
+            ['code' => 'BWP', 'name' => 'Pula', 'symbol' => 'P'],
+            ['code' => 'BYR', 'name' => 'Belarussian Ruble', 'symbol' => '₽'],
+            ['code' => 'BZD', 'name' => 'Belize Dollar', 'symbol' => 'BZ$'],
+            ['code' => 'CAD', 'name' => 'Canadian Dollar', 'symbol' => '$'],
+            ['code' => 'CHF', 'name' => 'Swiss Franc', 'symbol' => 'CHF'],
+            ['code' => 'CLP', 'name' => 'CLF Chilean Peso Unidades de fomento', 'symbol' => '$'],
+            ['code' => 'CNY', 'name' => 'Yuan Renminbi', 'symbol' => '¥'],
+            ['code' => 'COP', 'name' => 'COU Colombian Peso Unidad de Valor Real', 'symbol' => '$'],
+            ['code' => 'CRC', 'name' => 'Costa Rican Colon', 'symbol' => '₡'],
+            ['code' => 'CUP', 'name' => 'CUC Cuban Peso Peso Convertible', 'symbol' => '₱'],
+            ['code' => 'CZK', 'name' => 'Czech Koruna', 'symbol' => 'Kč'],
+            ['code' => 'DKK', 'name' => 'Danish Krone', 'symbol' => 'kr'],
+            ['code' => 'DOP', 'name' => 'Dominican Peso', 'symbol' => 'RD$'],
+            ['code' => 'EGP', 'name' => 'Egyptian Pound', 'symbol' => '£'],
+            ['code' => 'EUR', 'name' => 'Euro', 'symbol' => '€'],
+            ['code' => 'FJD', 'name' => 'Fiji Dollar', 'symbol' => '$'],
+            ['code' => 'FKP', 'name' => 'Falkland Islands Pound', 'symbol' => '£'],
+            ['code' => 'GBP', 'name' => 'Pound Sterling', 'symbol' => '£'],
+            ['code' => 'GIP', 'name' => 'Gibraltar Pound', 'symbol' => '£'],
+            ['code' => 'GTQ', 'name' => 'Quetzal', 'symbol' => 'Q'],
+            ['code' => 'GYD', 'name' => 'Guyana Dollar', 'symbol' => '$'],
+            ['code' => 'HKD', 'name' => 'Hong Kong Dollar', 'symbol' => '$'],
+            ['code' => 'HNL', 'name' => 'Lempira', 'symbol' => 'L'],
+            ['code' => 'HRK', 'name' => 'Croatian Kuna', 'symbol' => 'kn'],
+            ['code' => 'HUF', 'name' => 'Forint', 'symbol' => 'Ft'],
+            ['code' => 'IDR', 'name' => 'Rupiah', 'symbol' => 'Rp'],
+            ['code' => 'ILS', 'name' => 'New Israeli Sheqel', 'symbol' => '₪'],
+            ['code' => 'IRR', 'name' => 'Iranian Rial', 'symbol' => '﷼'],
+            ['code' => 'ISK', 'name' => 'Iceland Krona', 'symbol' => 'kr'],
+            ['code' => 'JMD', 'name' => 'Jamaican Dollar', 'symbol' => 'J$'],
+            ['code' => 'JPY', 'name' => 'Yen', 'symbol' => '¥'],
+            ['code' => 'KGS', 'name' => 'Som', 'symbol' => 'лв'],
+            ['code' => 'KHR', 'name' => 'Riel', 'symbol' => '៛'],
+            ['code' => 'KPW', 'name' => 'North Korean Won', 'symbol' => '₩'],
+            ['code' => 'KRW', 'name' => 'Won', 'symbol' => '₩'],
+            ['code' => 'KYD', 'name' => 'Cayman Islands Dollar', 'symbol' => '$'],
+            ['code' => 'KZT', 'name' => 'Tenge', 'symbol' => 'лв'],
+            ['code' => 'LAK', 'name' => 'Kip', 'symbol' => '₭'],
+            ['code' => 'LBP', 'name' => 'Lebanese Pound', 'symbol' => '£'],
+            ['code' => 'LKR', 'name' => 'Sri Lanka Rupee', 'symbol' => '₨'],
+            ['code' => 'LRD', 'name' => 'Liberian Dollar', 'symbol' => '$'],
+            ['code' => 'LTL', 'name' => 'Lithuanian Litas', 'symbol' => 'Lt'],
+            ['code' => 'LVL', 'name' => 'Latvian Lats', 'symbol' => 'Ls'],
+            ['code' => 'MKD', 'name' => 'Denar', 'symbol' => 'ден'],
+            ['code' => 'MNT', 'name' => 'Tugrik', 'symbol' => '₮'],
+            ['code' => 'MUR', 'name' => 'Mauritius Rupee', 'symbol' => '₨'],
+            ['code' => 'MXN', 'name' => 'MXV Mexican Peso Mexican Unidad de Inversion (UDI]', 'symbol' => '$'],
+            ['code' => 'MYR', 'name' => 'Malaysian Ringgit', 'symbol' => 'RM'],
+            ['code' => 'MZN', 'name' => 'Metical', 'symbol' => 'MT'],
+            ['code' => 'NGN', 'name' => 'Naira', 'symbol' => '₦'],
+            ['code' => 'NIO', 'name' => 'Cordoba Oro', 'symbol' => 'C$'],
+            ['code' => 'NOK', 'name' => 'Norwegian Krone', 'symbol' => 'kr'],
+            ['code' => 'NPR', 'name' => 'Nepalese Rupee', 'symbol' => '₨'],
+            ['code' => 'NZD', 'name' => 'New Zealand Dollar', 'symbol' => '$'],
+            ['code' => 'OMR', 'name' => 'Rial Omani', 'symbol' => '﷼'],
+            ['code' => 'PAB', 'name' => 'USD Balboa US Dollar', 'symbol' => 'B/.'],
+            ['code' => 'PEN', 'name' => 'Nuevo Sol', 'symbol' => 'S/.'],
+            ['code' => 'PHP', 'name' => 'Philippine Peso', 'symbol' => 'Php'],
+            ['code' => 'PKR', 'name' => 'Pakistan Rupee', 'symbol' => '₨'],
+            ['code' => 'PLN', 'name' => 'Zloty', 'symbol' => 'zł'],
+            ['code' => 'PYG', 'name' => 'Guarani', 'symbol' => 'Gs'],
+            ['code' => 'QAR', 'name' => 'Qatari Rial', 'symbol' => '﷼'],
+            ['code' => 'RON', 'name' => 'New Leu', 'symbol' => 'lei'],
+            ['code' => 'RSD', 'name' => 'Serbian Dinar', 'symbol' => 'Дин.'],
+            ['code' => 'RUB', 'name' => 'Russian Ruble', 'symbol' => 'руб'],
+            ['code' => 'SAR', 'name' => 'Saudi Riyal', 'symbol' => '﷼'],
+            ['code' => 'SBD', 'name' => 'Solomon Islands Dollar', 'symbol' => '$'],
+            ['code' => 'SCR', 'name' => 'Seychelles Rupee', 'symbol' => '₨'],
+            ['code' => 'SEK', 'name' => 'Swedish Krona', 'symbol' => 'kr'],
+            ['code' => 'SGD', 'name' => 'Singapore Dollar', 'symbol' => '$'],
+            ['code' => 'SHP', 'name' => 'Saint Helena Pound', 'symbol' => '£'],
+            ['code' => 'SOS', 'name' => 'Somali Shilling', 'symbol' => 'S'],
+            ['code' => 'SRD', 'name' => 'Surinam Dollar', 'symbol' => '$'],
+            ['code' => 'SVC', 'name' => 'USD El Salvador Colon US Dollar', 'symbol' => '$'],
+            ['code' => 'SYP', 'name' => 'Syrian Pound', 'symbol' => '£'],
+            ['code' => 'THB', 'name' => 'Baht', 'symbol' => '฿'],
+            ['code' => 'TRY', 'name' => 'Turkish Lira', 'symbol' => 'TL'],
+            ['code' => 'TTD', 'name' => 'Trinidad and Tobago Dollar', 'symbol' => 'TT$'],
+            ['code' => 'TWD', 'name' => 'New Taiwan Dollar', 'symbol' => 'NT$'],
+            ['code' => 'UAH', 'name' => 'Hryvnia', 'symbol' => '₴'],
+            ['code' => 'USD', 'name' => 'US Dollar', 'symbol' => '$'],
+            ['code' => 'UYU', 'name' => 'UYI Uruguay Peso en Unidades Indexadas', 'symbol' => '$U'],
+            ['code' => 'UZS', 'name' => 'Uzbekistan Sum', 'symbol' => 'лв'],
+            ['code' => 'VEF', 'name' => 'Bolivar Fuerte', 'symbol' => 'Bs'],
+            ['code' => 'VND', 'name' => 'Dong', 'symbol' => '₫'],
+            ['code' => 'XCD', 'name' => 'East Caribbean Dollar', 'symbol' => '$'],
+            ['code' => 'YER', 'name' => 'Yemeni Rial', 'symbol' => '﷼'],
+            ['code' => 'ZAR', 'name' => 'Rand', 'symbol' => 'R'],
         ];
     }
 
@@ -1041,7 +1046,7 @@ class GenerateSeeder extends Seeder
 
     public function States()
     {
-        return  $states = array(
+        return $states = array(
             // Canada
             array('code' => 'CA', 'abbreviation' => 'AB', 'name' => 'Alberta'),
             array('code' => 'CA', 'abbreviation' => 'BC', 'name' => 'British Columbia'),
